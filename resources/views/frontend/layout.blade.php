@@ -48,7 +48,7 @@
                         @else
                             <img src="{{ asset('images/logo.jpg') }}" alt="Logo" class="h-16 w-16 mr-3 rounded-full border-2 border-saffron shadow-sm object-cover">
                         @endif
-                        {{ \App\Models\Setting::getVal('site_name', 'भगवा दल') }} <span class="text-gray-400 ml-2 text-sm hidden md:inline">PORTAL</span>
+                        {{ \App\Models\Setting::getVal('site_name', 'भगवा दल') }}
                     </a>
                 </div>
                 <div class="hidden lg:flex lg:items-center lg:space-x-8 text-lg font-semibold">
