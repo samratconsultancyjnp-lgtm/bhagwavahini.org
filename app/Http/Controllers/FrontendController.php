@@ -12,8 +12,10 @@ use App\Models\Contact;
 use App\Models\Member;
 use App\Models\Setting;
 use App\Models\Designation;
+use App\Models\Donation;
 use Razorpay\Api\Api;
 use Carbon\Carbon;
+
 
 class FrontendController extends Controller
 {
@@ -209,4 +211,72 @@ class FrontendController extends Controller
 
         return view('frontend.idcard', compact('member', 'id_card_header_image', 'id_card_footer_image', 'id_card_watermark'));
     }
+
+    public function donations()
+    {
+        $upi_id = Setting::getVal('upi_id');
+        $bank_details = Setting::getVal('bank_details');
+        return view('frontend.donations', compact('upi_id', 'bank_details'));
+    }
+
+    public function submitDonation(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'required|digits:10',
+            'amount' => 'required|numeric|min:1',
+            'transaction_id' => 'required|string|max:100',
+            'payment_proof' => 'required|image|max:2048', // 2MB
+        ]);
+
+        $proofPath = $request->file('payment_proof')->store('donations', 'public');
+
+        Donation::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'amount' => $request->amount,
+            'transaction_id' => $request->transaction_id,
+            'payment_proof' => $proofPath,
+            'status' => 'pending',
+        ]);
+
+        return back()->with('success', 'दान के लिए धन्यवाद! प्रशासन द्वारा सत्यापन के बाद आपको आपकी रसीद प्राप्त होगी। (Thank you for your donation! You will receive your receipt after admin verification.)');
+    }
+
+    public function checkDonationStatus(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+            'transaction_id' => 'required|string',
+        ]);
+
+        $donation = Donation::where('phone', $request->phone)
+                            ->where('transaction_id', $request->transaction_id)
+                            ->first();
+
+        if (!$donation) {
+            return back()->with('error', 'कोई दान रिकॉर्ड नहीं मिला। (No donation record found.)');
+        }
+
+        if ($donation->status === 'pending') {
+            return back()->with('error', 'आपका दान अभी सत्यापन के अधीन है। (Your donation is still under verification.)');
+        }
+
+        if ($donation->status === 'rejected') {
+            return back()->with('error', 'आपका दान अस्वीकार कर दिया गया है। कारण: ' . ($donation->admin_note ?? 'अनिर्दिष्ट'));
+        }
+
+        // Redirect to slip view (reusing AdminController's slip view logic or just calling it if allowed, but better to have it here too or move to a trait)
+        $site_name = Setting::getVal('site_name', 'भगवा दल');
+        $site_logo = Setting::getVal('site_logo');
+        $site_address = Setting::getVal('site_address');
+        $site_phone = Setting::getVal('site_phone');
+        $site_email = Setting::getVal('site_email');
+
+        return view('frontend.donation_slip', compact('donation', 'site_name', 'site_logo', 'site_address', 'site_phone', 'site_email'));
+    }
 }
+
+

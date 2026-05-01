@@ -59,6 +59,8 @@
                     <a href="{{ route('events') }}" class="hover:text-saffron transition">आयोजन</a>
                     <a href="{{ route('contact') }}" class="hover:text-saffron transition text-gray-600">संपर्क</a>
                     <a href="{{ route('download.id') }}" class="hover:text-saffron transition font-bold text-saffron">ID Card डाउनलोड</a>
+                    <a href="{{ route('donations') }}" class="hover:text-saffron transition font-bold text-greenColor">दान करें</a>
+
                     @auth
                         <a href="{{ route('admin.dashboard') }}" class="text-gray-600 hover:text-saffron transition">डैशबोर्ड</a>
                     @else
@@ -86,6 +88,8 @@
                 <a href="{{ route('events') }}" class="block w-full py-3 text-lg font-bold text-gray-800 hover:text-saffron hover:bg-saffron/5 rounded-xl transition">आयोजन</a>
                 <a href="{{ route('contact') }}" class="block w-full py-3 text-lg font-bold text-gray-800 hover:text-saffron hover:bg-saffron/5 rounded-xl transition">संपर्क</a>
                 <a href="{{ route('download.id') }}" class="block w-full py-3 text-lg font-black text-saffron hover:text-saffronDark hover:bg-saffron/5 rounded-xl transition">ID Card डाउनलोड करें</a>
+                <a href="{{ route('donations') }}" class="block w-full py-3 text-lg font-black text-greenColor hover:text-green-700 hover:bg-green-50 rounded-xl transition">दान (Donation) करें</a>
+
                 
                 <div class="w-24 h-[2px] bg-saffron/20 my-2"></div>
                 
@@ -162,6 +166,8 @@
                         <li><a href="{{ route('about') }}" class="hover:text-white transition">हमारे बारे में</a></li>
                         <li><a href="{{ route('team') }}" class="hover:text-white transition">हमारी टीम</a></li>
                         <li><a href="{{ route('gallery') }}" class="hover:text-white transition">गैलरी</a></li>
+                        <li><a href="{{ route('donations') }}" class="hover:text-white transition">दान करें</a></li>
+
                     </ul>
                 </div>
 

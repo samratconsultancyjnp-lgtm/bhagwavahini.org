@@ -13,6 +13,8 @@ use App\Models\Member;
 use App\Models\Setting;
 
 use App\Models\Designation;
+use App\Models\Donation;
+
 
 class AdminController extends Controller
 {
@@ -32,6 +34,8 @@ class AdminController extends Controller
     public function membersIndex() { return view('admin.members.index', ['members' => Member::where('payment_status', '!=', 'pending')->latest()->get()]); }
     public function contactsIndex() { return view('admin.contacts.index', ['contacts' => Contact::all()]); }
     public function designationsIndex() { return view('admin.designations.index', ['designations' => Designation::all()]); }
+    public function donationsIndex() { return view('admin.donations.index', ['donations' => Donation::latest()->get()]); }
+
 
     public function settingsIndex()
     {
@@ -218,4 +222,38 @@ class AdminController extends Controller
         Designation::findOrFail($id)->delete();
         return back()->with('success', 'Designation deleted.');
     }
+
+    // Donations
+    public function donationsApprove(Request $request, $id) {
+        $donation = Donation::findOrFail($id);
+        $donation->update(['status' => 'approved']);
+        return back()->with('success', 'Donation approved successfully.');
+    }
+
+    public function donationsReject(Request $request, $id) {
+        $donation = Donation::findOrFail($id);
+        $donation->update(['status' => 'rejected', 'admin_note' => $request->admin_note]);
+        return back()->with('success', 'Donation rejected.');
+    }
+
+    public function donationSlip($id) {
+        $donation = Donation::findOrFail($id);
+        if ($donation->status !== 'approved') {
+            return back()->with('error', 'Donation slip can only be generated for approved donations.');
+        }
+        
+        $site_name = Setting::getVal('site_name', 'भगवा दल');
+        $site_logo = Setting::getVal('site_logo');
+        $site_address = Setting::getVal('site_address');
+        $site_phone = Setting::getVal('site_phone');
+        $site_email = Setting::getVal('site_email');
+
+        return view('frontend.donation_slip', compact('donation', 'site_name', 'site_logo', 'site_address', 'site_phone', 'site_email'));
+    }
+
+    public function donationsDestroy($id) {
+        Donation::findOrFail($id)->delete();
+        return back()->with('success', 'Donation record deleted.');
+    }
 }
+

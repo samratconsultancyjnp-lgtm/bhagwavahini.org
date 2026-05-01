@@ -32,6 +32,12 @@ Route::post('/join/payment/verify', [FrontendController::class, 'verifyPayment']
 // Download ID Card Routes
 Route::get('/download-id', [FrontendController::class, 'downloadId'])->name('download.id');
 Route::post('/download-id', [FrontendController::class, 'processDownloadId'])->name('download.id.process');
+
+Route::get('/donations', [FrontendController::class, 'donations'])->name('donations');
+Route::post('/donations', [FrontendController::class, 'submitDonation'])->name('donations.submit');
+Route::get('/donations/status', [FrontendController::class, 'checkDonationStatus'])->name('donations.status');
+
+
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
     
@@ -71,6 +77,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/designations', [AdminController::class, 'designationsIndex'])->name('designations.index');
     Route::post('/designations', [AdminController::class, 'designationsStore'])->name('designations.store');
     Route::delete('/designations/{id}', [AdminController::class, 'designationsDestroy'])->name('designations.destroy');
+
+    // Donations
+    Route::get('/donations', [AdminController::class, 'donationsIndex'])->name('donations.index');
+    Route::post('/donations/{id}/approve', [AdminController::class, 'donationsApprove'])->name('donations.approve');
+    Route::post('/donations/{id}/reject', [AdminController::class, 'donationsReject'])->name('donations.reject');
+    Route::delete('/donations/{id}', [AdminController::class, 'donationsDestroy'])->name('donations.destroy');
+    Route::get('/donations/{id}/slip', [AdminController::class, 'donationSlip'])->name('donations.slip');
+
 
     // Settings (Razorpay, etc.)
     Route::get('/settings', [AdminController::class, 'settingsIndex'])->name('settings.index');
